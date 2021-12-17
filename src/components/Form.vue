@@ -11,12 +11,12 @@
 		</div>
     <div class="row">
 			<label for="email">Email:</label>
-			<input id="email" type="email" v-model="email">
-      <p v-if="emailwrong">Must be email</p>
+			<input id="email" v-on:click="emailwrong = false" type="email" v-model="email" ref="email">
+      <span v-if="emailwrong" style="color: red; font-weight: bold;">Must be email</span>
 		</div>
     <div class="row">
 			<label for="DoB">Date of Birth:</label>
-			<input id="DoB" type="datetime-local" v-model="DoB">
+			<input id="DoB" v-on:click="DoBwrong = false" type="date" v-model="DoB" ref="DoB" max="2005-12-31">
       <p v-if="DoBwrong">Must be in date/time</p>
 		</div>
     <div class="row">
@@ -27,7 +27,7 @@
 			<option value="HR">HR</option>
 </select>
 </div>
-    <button v-on:click="add">Add</button>
+    <button v-on:click="add">Add</button> <span v-if="isEmpty">Please input field</span>
 </div>
 
   <table>
@@ -43,30 +43,54 @@
     <th></th>
   </tr>
   </thead>
-  <tbody v-if="edituser">
+  <tbody v-if='!search'>
   <tr  v-for="(user, i) in users" :key="i">
-    <td>1</td>
-    <td><input v-model="editaccount"></td>
-    <td><input v-model="editname"></td>
-    <td><input v-model="editemail"></td>
-    <td><input v-model="editDoB"></td>
-    <td><input v-model="editRole"></td>
-    <td><button v-on:click="save(i)">Save</button></td>
-    <td><button v-on:click="cancel(i)">Cancel</button></td>
+    <td v-if="!user.editing">{{user.id}}</td>
+    <td v-if="!user.editing">{{user.account}}</td>
+    <td v-if="!user.editing">{{user.name}}</td>
+    <td v-if="!user.editing">{{user.email}}</td>
+    <td v-if="!user.editing">{{user.DoB}}</td>
+    <td v-if="!user.editing">{{user.role}}</td>
+    <td v-if="!user.editing"><button v-on:click="edit(i)">Edit</button></td>
+    <td v-if="!user.editing"><button v-on:click="remove(i)">Delete</button></td>
+    <td v-if="user.editing">{{user.id}}</td>
+    <td v-if="user.editing"><input v-model="editaccount"></td>
+    <td v-if="user.editing"><input v-model="editname"></td>
+    <td v-if="user.editing"><input v-model="editemail" type='email'></td>
+    <td v-if="user.editing"><input v-model="editDoB" type='date'></td>
+    <td v-if="user.editing"><select v-model="editrole">
+			<option value="PM">PM</option>
+			<option value="Dev">Dev</option>
+			<option value="HR">HR</option>
+</select></td>
+    <td v-if="user.editing"><button v-on:click="save(i)">Save</button></td>
+    <td v-if="user.editing"><button v-on:click="cancel(i)">Cancel</button></td>
   </tr>
   </tbody>
-  <tbody v-else>
-  <tr  v-for="(user, i) in users" :key="i">
-    <td>1</td>
-    <td>{{account}}</td>
-    <td>{{name}}</td>
-    <td>{{email}}</td>
-    <td>{{DoB}}</td>
-    <td>{{role}}</td>
-    <td><button v-on:click="edit(i)">Edit</button></td>
-    <td><button v-on:click="remove(i)">Delete</button></td>
+  <!-- <tbody v-if='search'>
+    <tr v-for="(user, i) in users" :key="i">
+    <td v-if="!user.editing">1</td>
+    <td v-if="!user.editing">{{user.account}}</td>
+    <td v-if="!user.editing">{{user.name}}</td>
+    <td v-if="!user.editing">{{user.email}}</td>
+    <td v-if="!user.editing">{{user.DoB}}</td>
+    <td v-if="!user.editing">{{user.role}}</td>
+    <td v-if="!user.editing"><button v-on:click="edit(i)">Edit</button></td>
+    <td v-if="!user.editing"><button v-on:click="remove(i)">Delete</button></td>
+    <td v-if="user.editing">1</td>
+    <td v-if="user.editing"><input v-model="editaccount"></td>
+    <td v-if="user.editing"><input v-model="editname"></td>
+    <td v-if="user.editing"><input v-model="editemail" type='email'></td>
+    <td v-if="user.editing"><input v-model="editDoB" type='date'></td>
+    <td v-if="user.editing"><select v-model="editrole">
+			<option value="PM">PM</option>
+			<option value="Dev">Dev</option>
+			<option value="HR">HR</option>
+</select></td>
+    <td v-if="user.editing"><button v-on:click="save(i)">Save</button></td>
+    <td v-if="user.editing"><button v-on:click="cancel(i)">Cancel</button></td>
   </tr>
-  </tbody>
+  </tbody> -->
 
   </table>
 
@@ -82,28 +106,40 @@ export default {
 		email: '',
 		DoB: '',
 		role: '',
-		test: 1,
-    edituser: false,
 		users: [],
     emailwrong: false,
-    DoBwrong: false
-
+    DoBwrong: false,
+    isEmpty: false,
+    editaccount: '',
+		editname: '',
+		editemail: '',
+		editDoB: '',
+		editrole: '',
     }
 	},
   methods: {
     add() {
+        
+
         const newUser = {
           account: this.account,
           name: this.name,
           email: this.email,
           DoB: this.DoB,
-          role: this.role
+          role: this.role,
+          editing: false,
         }
-        if (!this.email.match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/")) this.emailwrong = true;
-        if (!this.email.match("/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$")) this.DoBwrong = true;
-        if (this.emailwrong || this.DoBwrong ) return;
+
+        if(!this.$refs.email.checkValidity()) this.emailwrong = true 
+        else this.emailwrong = false;
+        if(!this.$refs.DoB.checkValidity()) this.DoBwrong = true
+        else this.DoBwrong = false;
+        if (this.account === '', this.name=== '', this.email === '', this.DoB === '', this.role === '') this.isEmpty = true;
+        else this.isEmpty = false;
+        if (this.emailwrong || this.DoBwrong || this.isEmpty ) return;
         this.users.push(newUser);
-        console.log(this.users[0]);
+        const index = this.users.indexOf(newUser);
+        this.users[index].id = index + 1;
     },
     edit(i) {
       this.editaccount = this.users[i].account;
@@ -111,19 +147,35 @@ export default {
       this.editemail = this.users[i].email;
       this.editDoB = this.users[i].DoB;
       this.editrole = this.users[i].role;
-      this.edituser = true;
+      this.users[i].editing = true;
       console.log(i);
     },
     remove (i) {
-      this.users.splice(i, 1)
+        if (confirm('Are you sure you want to delete?') == true) {
+        this.users.splice(i, 1)
+        } else {
+        return;
+  }
+    },
+    cancel (i) {
+      this.users[i].editing = false;
+    },
+    save(i) {
+      this.users[i].account = this.editaccount;
+      this.users[i].name = this.editname;
+      this.users[i].email = this.editemail;
+      this.users[i].DoB = this.editDoB;
+      this.users[i].role = this.editrole;
+      this.users[i].editing = false;
     }
+
 }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .form	form  {
+  .form  {
     display: table;
   }
 	div .row { 
