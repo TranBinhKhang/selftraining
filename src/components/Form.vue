@@ -12,10 +12,12 @@
     <div class="row">
 			<label for="email">Email:</label>
 			<input id="email" type="email" v-model="email">
+      <p v-if="emailwrong">Must be email</p>
 		</div>
     <div class="row">
 			<label for="DoB">Date of Birth:</label>
 			<input id="DoB" type="datetime-local" v-model="DoB">
+      <p v-if="DoBwrong">Must be in date/time</p>
 		</div>
     <div class="row">
 <label for="role">Role:</label>
@@ -82,7 +84,10 @@ export default {
 		role: '',
 		test: 1,
     edituser: false,
-		users: []
+		users: [],
+    emailwrong: false,
+    DoBwrong: false
+
     }
 	},
   methods: {
@@ -94,6 +99,9 @@ export default {
           DoB: this.DoB,
           role: this.role
         }
+        if (!this.email.match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/")) this.emailwrong = true;
+        if (!this.email.match("/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$")) this.DoBwrong = true;
+        if (this.emailwrong || this.DoBwrong ) return;
         this.users.push(newUser);
         console.log(this.users[0]);
     },
