@@ -1,0 +1,106 @@
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.locators.RelativeLocator;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import java.util.List;
+
+public class TestClass {
+
+    //SELECT is in lesson 10
+
+    ChromeDriver chromeDriver;
+    @BeforeMethod
+    public void Setup(){
+        WebDriverManager.chromedriver().setup();
+        chromeDriver = new ChromeDriver();
+    }
+
+    @Test
+    public void run(){
+//        System.out.println("Steiner");
+//        Assert.assertEquals(2, 2, "you dense madafaka");
+//        chromeDriver.get("https://auto.fresher.dev/lessons/lession7/index.html");
+//        WebElement button1 = chromeDriver.findElement(By.id("btnExample1"));
+//        String text = button1.getText();
+//        System.out.println(text + " is for you my negga");
+//
+//        Actions action = new Actions(chromeDriver);
+//        //click for left click, contextClick for double, dragAndDrop for drag and drop
+//        action.click(button1).build().perform();
+//
+//        action.sendKeys(button1, "nigga").build().perform();
+//
+//        Sleep(3000);
+//        //element.clear to clear elements
+
+
+        Sleep(3000);
+        chromeDriver.get("https://www.studentstutorial.com/demo/php/crud?id=1");
+
+        //Click checkbox
+        List<WebElement> checkboxes = chromeDriver.findElements(By.cssSelector("input[type='checkbox']"));
+        for (WebElement checkbox : checkboxes) {
+            checkbox.click();
+        }
+        //click update
+        chromeDriver.findElement(By.xpath("/html/body/div[1]/div/div[2]/table/tbody/tr[1]/td[7]/a[1]")).click();
+        Sleep(1000);
+        chromeDriver.findElement(By.xpath("/html/body/div[3]/div/div/form/div[3]/input[2]")).click();
+        Sleep(1000);
+        chromeDriver.findElement(By.xpath("/html/body/div[1]/div/div[1]/div/div[2]/a[1]")).click();
+        Sleep(1000);
+        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/form/div[2]/div[1]/input")).sendKeys("HAVA NAGILA HAVA");
+//        By emailLocator = RelativeLocator.with(By.tagName("input")).below(By.xpath("/html/body/div[2]/div/div/form/div[2]/div[1]/input"));
+//        chromeDriver.findElement(By.emailLocator).sendKeys("HAVA NAGILA HAVA");
+        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/form/div[2]/div[2]/input")).sendKeys("HAVA NAGILA HAVA");
+        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/form/div[2]/div[3]/input")).sendKeys("HAVA NAGILA HAVA");
+        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/form/div[2]/div[4]/input")).sendKeys("HAVA NAGILA HAVA");
+
+
+        Sleep(3000);
+
+    }
+
+    public void removeAttribute(WebElement element, String attr) {
+        ((JavascriptExecutor) chromeDriver).executeScript("arguments[0].removeAttribute('" + attr + "')", element);
+    }
+
+    public void setAttribute(WebElement element, String attr) {
+        ((JavascriptExecutor) chromeDriver).executeScript("arguments[0].setAttribute('" + attr + "')", element);
+    }
+
+    public String getText(WebElement element) {
+        return element.getAttribute("value");
+    }
+
+    public void sendText(WebElement element, String input) {
+        element.clear();
+        Sleep(100);
+        element.sendKeys(input);
+        Sleep(100);
+
+    }
+
+
+    @AfterMethod
+    public void Cleanup(){
+        System.out.println("STEINER LIBERATED BERLIN MIEN FUTEHR");
+        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/form/div[1]/button")).click();
+    }
+
+    private void Sleep(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (Exception ex) {
+            System.out.printf(ex.getMessage());
+        }
+    }
+
+
+}
